@@ -1,5 +1,6 @@
 """Email Automation Center View for InternFlow AI."""
 
+import time
 import pandas as pd
 import streamlit as st
 
@@ -144,7 +145,7 @@ def render_email_center_view():
                         recipient_name="Coordinator Test",
                         template_type=template_choice,
                         context=test_ctx,
-                        task_id="TEST-LIVE",
+                        task_id=f"TEST-LIVE-{int(time.time() * 1000)}",
                         force_send=True,
                     )
                 if success:

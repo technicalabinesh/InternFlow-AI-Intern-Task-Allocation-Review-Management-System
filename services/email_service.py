@@ -395,11 +395,10 @@ class EmailService:
         )
 
         with get_db() as db:
-            # Check idempotency unless force_send is requested
-            if not force_send:
-                existing = db.query(EmailLog).filter(EmailLog.idempotency_key == idempotency_key).first()
-                if existing and existing.status in ("Sent", "Simulated"):
-                    return True, existing.status, f"Duplicate prevented: email already logged ({existing.status}) today."
+            # Check for existing log with this idempotency key
+            existing = db.query(EmailLog).filter(EmailLog.idempotency_key == idempotency_key).first()
+            if existing and not force_send and existing.status in ("Sent", "Simulated"):
+                return True, existing.status, f"Duplicate prevented: email already logged ({existing.status}) today."
 
             subject, html_body, plain_body = cls.render_template(template_type, context)
             provider = cls.get_provider()
@@ -412,20 +411,32 @@ class EmailService:
                 plain_body=plain_body,
             )
 
-            email_log = EmailLog(
-                recipient_email=recipient_email,
-                recipient_name=recipient_name,
-                template_type=template_type,
-                subject=subject,
-                body_preview=plain_body[:300] + ("..." if len(plain_body) > 300 else ""),
-                idempotency_key=idempotency_key,
-                status=status_label,
-                provider="mock" if isinstance(provider, MockEmailProvider) else "gmail",
-                message_id=msg_or_err if success else None,
-                error_message=None if success else msg_or_err,
-                sent_at=datetime.datetime.utcnow(),
-            )
-            db.add(email_log)
+            provider_name = "mock" if isinstance(provider, MockEmailProvider) else ("smtp" if isinstance(provider, GmailSMTPProvider) else "gmail")
+
+            # Upsert into email_logs to avoid UNIQUE constraint violation on idempotency_key
+            if existing:
+                existing.subject = subject
+                existing.body_preview = plain_body[:300] + ("..." if len(plain_body) > 300 else "")
+                existing.status = status_label
+                existing.provider = provider_name
+                existing.message_id = msg_or_err if success else None
+                existing.error_message = None if success else msg_or_err
+                existing.sent_at = datetime.datetime.utcnow()
+            else:
+                email_log = EmailLog(
+                    recipient_email=recipient_email,
+                    recipient_name=recipient_name,
+                    template_type=template_type,
+                    subject=subject,
+                    body_preview=plain_body[:300] + ("..." if len(plain_body) > 300 else ""),
+                    idempotency_key=idempotency_key,
+                    status=status_label,
+                    provider=provider_name,
+                    message_id=msg_or_err if success else None,
+                    error_message=None if success else msg_or_err,
+                    sent_at=datetime.datetime.utcnow(),
+                )
+                db.add(email_log)
 
             # Update assignment last email status if available
             assignment = db.query(TaskAssignment).filter(
@@ -442,7 +453,7 @@ class EmailService:
     @classmethod
     def send_test_email(cls, template_type: str, context: Dict[str, Any]) -> Tuple[bool, str, str]:
         """Send a test email to the designated coordinator address."""
-        test_recipient = EMAIL_TEST_RECIPIENT or "coordinator-test@example.com"
+        test_recipient = EMAIL_TEST_RECIPIENT or "m.abinesh555@gmail.com"
         context_copy = dict(context)
         context_copy["Intern_Name"] = f"[TEST] {context_copy.get('Intern_Name', 'Coordinator')}"
         return cls.send_email(
@@ -450,7 +461,7 @@ class EmailService:
             recipient_name="Test Coordinator",
             template_type=template_type,
             context=context_copy,
-            task_id="TEST-PREVIEW",
+            task_id=f"TEST-{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}",
             force_send=True,
         )
 
