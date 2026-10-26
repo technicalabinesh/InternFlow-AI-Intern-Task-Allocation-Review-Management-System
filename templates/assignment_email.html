@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 20px; }
+  .container { max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
+  .header { background: #1e3a8a; color: #ffffff; padding: 24px; text-align: left; }
+  .content { padding: 24px; line-height: 1.6; }
+  .badge { display: inline-block; padding: 4px 10px; background: #e0e7ff; color: #3730a3; font-weight: bold; border-radius: 4px; font-size: 12px; }
+  .box { background: #f1f5f9; border-left: 4px solid #2563eb; padding: 14px 18px; margin: 18px 0; border-radius: 0 6px 6px 0; }
+  .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px 24px; font-size: 12px; color: #64748b; text-align: center; }
+  .btn { display: inline-block; background: #2563eb; color: #ffffff !important; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h2 style="margin: 0; font-size: 20px;">InternFlow AI — New Task Assignment</h2>
+  </div>
+  <div class="content">
+    <p>Hi <strong>{{Intern_Name}}</strong>,</p>
+    <p>Your new internship task has been officially assigned by your coordination team.</p>
+    
+    <div class="box">
+      <div style="margin-bottom: 6px;"><span class="badge">TASK</span> <strong>{{Task_Title}}</strong> (ID: {{Task_ID}})</div>
+      <div><strong>Priority:</strong> {{Task_Priority}}</div>
+      <div><strong>Assigned Date:</strong> {{Assigned_Date}}</div>
+      <div><strong>Deadline:</strong> <span style="color: #dc2626; font-weight: bold;">{{Deadline}}</span></div>
+    </div>
+
+    <h4 style="margin-bottom: 6px; color: #1e3a8a;">What You Need to Do (Simplified Instructions):</h4>
+    <p style="white-space: pre-line; background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0;">{{Simplified_Task_Explanation}}</p>
+
+    <h4 style="margin-bottom: 6px; color: #1e3a8a;">Required Documents & Deliverables:</h4>
+    <p>{{Required_Documents}}</p>
+
+    <div class="box" style="border-left-color: #059669;">
+      <h4 style="margin-top: 0; color: #065f46;">Initial Review Meeting:</h4>
+      <div><strong>Date:</strong> {{Review_Date}} at {{Review_Time}}</div>
+      <div><strong>Meeting Link:</strong> <a href="{{Meeting_Link}}">{{Meeting_Link}}</a></div>
+      <div><strong>Assigned Mentor:</strong> {{Mentor_Email}}</div>
+    </div>
+
+    <h4 style="margin-bottom: 6px; color: #1e3a8a;">Submission Instructions:</h4>
+    <p>{{Submission_Instructions}}</p>
+
+    <p style="margin-top: 24px;">Please review the acceptance criteria carefully and submit your work before the deadline.</p>
+    <p>Regards,<br><strong>Internship Coordination Team</strong><br>InternFlow AI Management Portal</p>
+  </div>
+  <div class="footer">
+    This is an automated notification from InternFlow AI. Do not reply directly to this email.
+  </div>
+</div>
+</body>
+</html>
