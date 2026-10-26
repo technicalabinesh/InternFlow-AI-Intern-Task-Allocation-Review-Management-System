@@ -69,9 +69,11 @@ EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "mock").lower()
 GMAIL_CLIENT_SECRETS_FILE = os.getenv("GMAIL_CLIENT_SECRETS_FILE", str(BASE_DIR / "credentials.json"))
 GMAIL_TOKEN_FILE = os.getenv("GMAIL_TOKEN_FILE", str(BASE_DIR / "token.json"))
 EMAIL_SENDER_NAME = os.getenv("EMAIL_SENDER_NAME", "InternFlow AI Coordinator")
-EMAIL_SENDER_ADDRESS = os.getenv("EMAIL_SENDER_ADDRESS", "coordinator@example.com")
+EMAIL_SENDER_ADDRESS = os.getenv("EMAIL_SENDER_ADDRESS", "m.abinesh555@gmail.com")
+GMAIL_USER = os.getenv("GMAIL_USER", os.getenv("EMAIL_SENDER_ADDRESS", "m.abinesh555@gmail.com"))
+GMAIL_APP_PASSWORD = os.getenv("GMAIL_APP_PASSWORD", "")
 EMAIL_RATE_LIMIT_PER_MINUTE = int(os.getenv("EMAIL_RATE_LIMIT_PER_MINUTE", "30"))
-EMAIL_TEST_RECIPIENT = os.getenv("EMAIL_TEST_RECIPIENT", "coordinator-test@example.com")
+EMAIL_TEST_RECIPIENT = os.getenv("EMAIL_TEST_RECIPIENT", "m.abinesh555@gmail.com")
 
 # Timezone
 DEFAULT_TIMEZONE = os.getenv("DEFAULT_TIMEZONE", "Asia/Kolkata")

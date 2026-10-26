@@ -11,6 +11,7 @@ import base64
 import hashlib
 import datetime
 import time
+import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -22,6 +23,8 @@ from config.settings import (
     GMAIL_TOKEN_FILE,
     EMAIL_SENDER_NAME,
     EMAIL_SENDER_ADDRESS,
+    GMAIL_USER,
+    GMAIL_APP_PASSWORD,
     EMAIL_RATE_LIMIT_PER_MINUTE,
     EMAIL_TEST_RECIPIENT,
     DEMO_MODE,
@@ -186,6 +189,41 @@ class MockEmailProvider(BaseEmailProvider):
         return True, "Simulated", simulated_msg_id
 
 
+class GmailSMTPProvider(BaseEmailProvider):
+    """Real Gmail sender using SMTP with Google App Password (TLS port 587)."""
+
+    def __init__(self, username: str, app_password: str):
+        self.username = username or EMAIL_SENDER_ADDRESS
+        self.app_password = (app_password or "").replace(" ", "").strip()
+
+    def send(self, recipient_email: str, recipient_name: str, subject: str, html_body: str, plain_body: str) -> Tuple[bool, str, Optional[str]]:
+        if not self.app_password:
+            return False, "Failed", "Gmail App Password is missing. Please enter your 16-character Google App Password in Settings > Email Integration."
+
+        try:
+            message = MIMEMultipart("alternative")
+            message["to"] = f"{recipient_name} <{recipient_email}>" if recipient_name else recipient_email
+            message["from"] = f"{EMAIL_SENDER_NAME} <{self.username}>"
+            message["subject"] = subject
+
+            part1 = MIMEText(plain_body, "plain", "utf-8")
+            part2 = MIMEText(html_body, "html", "utf-8")
+            message.attach(part1)
+            message.attach(part2)
+
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
+                server.starttls()
+                server.login(self.username, self.app_password)
+                server.sendmail(self.username, [recipient_email], message.as_string())
+
+            msg_id = f"smtp-{datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S')}-{hashlib.md5(recipient_email.encode()).hexdigest()[:8]}"
+            return True, "Sent", msg_id
+        except smtplib.SMTPAuthenticationError:
+            return False, "Failed", "Gmail SMTP authentication failed. Please verify your Google email address and ensure you generated a 16-character App Password (https://myaccount.google.com/apppasswords)."
+        except Exception as e:
+            return False, "Failed", f"SMTP delivery error: {str(e)}"
+
+
 class GmailOAuthProvider(BaseEmailProvider):
     """Real Gmail API sender using OAuth 2.0 credentials."""
 
@@ -214,7 +252,10 @@ class GmailOAuthProvider(BaseEmailProvider):
                     creds.refresh(Request())
                 elif os.path.exists(self.client_secrets_file):
                     flow = InstalledAppFlow.from_client_secrets_file(self.client_secrets_file, SCOPES)
-                    creds = flow.run_local_server(port=0)
+                    try:
+                        creds = flow.run_local_server(port=8080)
+                    except Exception:
+                        creds = flow.run_local_server(port=0)
                     with open(self.token_file, "w") as token:
                         token.write(creds.to_json())
 
@@ -228,7 +269,7 @@ class GmailOAuthProvider(BaseEmailProvider):
     def send(self, recipient_email: str, recipient_name: str, subject: str, html_body: str, plain_body: str) -> Tuple[bool, str, Optional[str]]:
         service = self._get_service()
         if not service:
-            return False, "Failed", "Gmail OAuth credentials not configured or authorization required."
+            return False, "Failed", "Gmail OAuth token not authorized. Click 'Authorize Gmail' or provide a 16-character Google App Password for instant delivery."
 
         try:
             message = MIMEMultipart("alternative")
@@ -251,9 +292,26 @@ class GmailOAuthProvider(BaseEmailProvider):
 class EmailService:
     @classmethod
     def get_provider(cls) -> BaseEmailProvider:
-        if DEMO_MODE or EMAIL_PROVIDER.lower() == "mock":
+        import config.settings as conf
+        demo_mode = getattr(conf, "DEMO_MODE", False)
+        provider_name = getattr(conf, "EMAIL_PROVIDER", "mock").lower()
+
+        if demo_mode or provider_name == "mock":
             return MockEmailProvider()
-        return GmailOAuthProvider(GMAIL_CLIENT_SECRETS_FILE, GMAIL_TOKEN_FILE)
+
+        # Check environment variables / settings
+        app_pwd = (os.getenv("GMAIL_APP_PASSWORD") or getattr(conf, "GMAIL_APP_PASSWORD", "") or "").strip()
+        user_email = (os.getenv("GMAIL_USER") or getattr(conf, "GMAIL_USER", "") or getattr(conf, "EMAIL_SENDER_ADDRESS", "") or "m.abinesh555@gmail.com").strip()
+
+        # If App Password is provided, prefer SMTP for instant zero-friction delivery
+        if app_pwd:
+            return GmailSMTPProvider(user_email, app_pwd)
+
+        # Otherwise try OAuth credentials
+        if os.path.exists(conf.GMAIL_TOKEN_FILE) or os.path.exists(conf.GMAIL_CLIENT_SECRETS_FILE):
+            return GmailOAuthProvider(conf.GMAIL_CLIENT_SECRETS_FILE, conf.GMAIL_TOKEN_FILE)
+
+        return MockEmailProvider()
 
     @classmethod
     def render_template(cls, template_type: str, context: Dict[str, Any]) -> Tuple[str, str, str]:

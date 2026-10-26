@@ -4,8 +4,10 @@ import pytest
 from services.email_service import EmailService, MockEmailProvider
 
 
-def test_demo_mode_guarantees_mock_provider():
-    # Verify that get_provider returns MockEmailProvider by default in demo mode
+def test_demo_mode_guarantees_mock_provider(monkeypatch):
+    import config.settings as settings
+    monkeypatch.setattr(settings, "DEMO_MODE", True)
+    monkeypatch.setattr(settings, "EMAIL_PROVIDER", "mock")
     provider = EmailService.get_provider()
     assert isinstance(provider, MockEmailProvider)
 

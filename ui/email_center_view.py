@@ -120,15 +120,38 @@ def render_email_center_view():
                 st.text_area("Plain Text Content", value=plain_body, height=300)
 
             st.markdown("---")
-            st.markdown("#### Send Test Email")
-            st.caption(f"Send a single test dispatch to coordinator inbox: `{EMAIL_TEST_RECIPIENT}`")
-            if st.button("🧪 Send Test Email to Coordinator", type="secondary"):
-                with st.spinner("Dispatching test email..."):
-                    success, status_lbl, msg = EmailService.send_test_email(template_choice, ctx)
+            st.markdown("#### 🧪 Test Live Email Delivery")
+            st.caption("Verify your Gmail configuration by dispatching a live email to your inbox.")
+
+            c_snd1, c_snd2 = st.columns([2, 1])
+            with c_snd1:
+                custom_recipient = st.text_input(
+                    "Recipient Inbox (Your Email):",
+                    value=st.session_state.email or "m.abinesh555@gmail.com",
+                    key="custom_test_email_recipient",
+                )
+            with c_snd2:
+                st.write("")
+                st.write("")
+                send_clicked = st.button("🚀 Send Live Test Email", type="primary", use_container_width=True)
+
+            if send_clicked:
+                with st.spinner(f"Connecting to Gmail and dispatching to {custom_recipient}..."):
+                    test_ctx = dict(ctx)
+                    test_ctx["Intern_Name"] = f"[TEST LIVE] {test_ctx.get('Intern_Name', 'Coordinator')}"
+                    success, status_lbl, msg = EmailService.send_email(
+                        recipient_email=custom_recipient,
+                        recipient_name="Coordinator Test",
+                        template_type=template_choice,
+                        context=test_ctx,
+                        task_id="TEST-LIVE",
+                        force_send=True,
+                    )
                 if success:
-                    st.success(f"✅ Test Email processed! Status: **{status_lbl}** | Info: {msg}")
+                    st.success(f"🎉 Email successfully dispatched to **{custom_recipient}**! Status: **{status_lbl}** (Message ID: `{msg}`)")
                 else:
-                    st.error(f"❌ Dispatch failed: {msg}")
+                    st.error(f"❌ Delivery failed: {msg}")
+                    st.info("💡 **Quick Delivery Option:** For 100% immediate delivery, generate a 16-character [Google App Password](https://myaccount.google.com/apppasswords) and enter it in **⚙️ Settings & Integrations > Gmail API & Email Provider**.")
 
         # Tab 2: Bulk Email Dispatch
         with tab_batch:
