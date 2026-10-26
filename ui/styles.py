@@ -28,7 +28,7 @@ def apply_custom_styles():
     }
 
     .block-container {
-        padding-top: 1.2rem !important;
+        padding-top: 4.6rem !important;
         padding-bottom: 3rem !important;
         max-width: 95% !important;
     }
@@ -41,6 +41,7 @@ def apply_custom_styles():
         background: #F4F3EF !important;
         box-shadow: none !important;
         border-bottom: none !important;
+        height: 3.2rem !important;
     }
 
     div[data-testid="stDecoration"] {
