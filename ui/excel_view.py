@@ -26,7 +26,20 @@ def render_excel_view():
         # Tab 1: Upload & Import
         with tab_import:
             st.markdown("#### Upload `.xlsx` or `.csv` Workbook")
-            st.info("The workbook must adhere to the 24 standard columns. Any row-level discrepancies will be flagged below.")
+            st.info("The workbook supports your exact column format (including `Review Date`, `Google Meet Link`, `Task Status`, `Review Status`, `Reviewer Feedback`, `Next Follow-up Date`, `Last Email Status`, `Notes`). Any discrepancies will be flagged below.")
+
+            test_file_path = BASE_DIR / "InternFlow_Test_Workbook.xlsx"
+            if test_file_path.exists():
+                c_t1, c_t2 = st.columns([2, 1])
+                with c_t1:
+                    st.caption(f"📁 Generated test workbook saved to your Desktop: `C:\\Users\\Hari\\Desktop\\InternFlow_Test_Workbook.xlsx`")
+                with c_t2:
+                    st.download_button(
+                        label="📥 Download Test File (.xlsx)",
+                        data=test_file_path.read_bytes(),
+                        file_name="InternFlow_Test_Workbook.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    )
 
             uploaded_file = st.file_uploader("Choose an Excel (.xlsx) or CSV (.csv) file", type=["xlsx", "csv"])
 
