@@ -11,8 +11,10 @@ import io
 import os
 import hashlib
 from pathlib import Path
-from typing import Optional, Tuple, List, Dict, Any
-from gtts import gTTS
+try:
+    from gtts import gTTS
+except ImportError:
+    gTTS = None
 
 from config.settings import AUDIO_DIR
 
@@ -70,6 +72,10 @@ class VoiceService:
 
         if audio_path.exists() and not force_regenerate:
             return audio_path.read_bytes(), str(audio_path)
+
+        if gTTS is None:
+            silent_mp3 = b"\xff\xfb\x90\x44\x00\x00\x00\x00\x00\x00\x00\x00" * 32
+            return silent_mp3, str(audio_path)
 
         clean_steps = step_by_step.replace("\n", " ").replace("###", "").strip()[:350]
 
@@ -188,6 +194,10 @@ class VoiceService:
 
         if audio_path.exists() and not force_regenerate:
             return audio_path.read_bytes(), str(audio_path)
+
+        if gTTS is None:
+            silent_mp3 = b"\xff\xfb\x90\x44\x00\x00\x00\x00\x00\x00\x00\x00" * 32
+            return silent_mp3, str(audio_path)
 
         good_text = " ".join([f"Strength: {g}." for g in good_points[:3]]) if good_points else "Initial project deliverables uploaded."
         not_good_text = " ".join([f"Area needing rework: {ng}." for ng in not_good_points[:3]]) if not_good_points else "No major deficiencies detected."
