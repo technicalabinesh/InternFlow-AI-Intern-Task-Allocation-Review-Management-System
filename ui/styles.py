@@ -33,10 +33,143 @@ def apply_custom_styles():
         max-width: 95% !important;
     }
 
+    /* Eliminate Streamlit Top Header Black Bar */
+    header[data-testid="stHeader"],
+    .stAppHeader,
+    div[data-testid="stToolbar"] {
+        background-color: #F4F3EF !important;
+        background: #F4F3EF !important;
+        box-shadow: none !important;
+        border-bottom: none !important;
+    }
+
+    div[data-testid="stDecoration"] {
+        display: none !important;
+        height: 0px !important;
+        background: transparent !important;
+    }
+
+    header[data-testid="stHeader"] button,
+    header[data-testid="stHeader"] a,
+    header[data-testid="stHeader"] span,
+    header[data-testid="stHeader"] svg {
+        color: #1E1E24 !important;
+        fill: #1E1E24 !important;
+    }
+
     /* Left Sidebar Styling */
     section[data-testid="stSidebar"] {
         background-color: #FAF9F6 !important;
         border-right: 2.5px solid #1E1E24 !important;
+    }
+
+    /* Sidebar Top Header & Collapse Button */
+    div[data-testid="stSidebarHeader"],
+    div[data-testid="stSidebarCollapseButton"] button {
+        background-color: transparent !important;
+        color: #151D2A !important;
+    }
+
+    div[data-testid="stSidebarCollapseButton"] svg {
+        fill: #151D2A !important;
+    }
+
+    /* Make ALL Sidebar Text High-Contrast Crisp Dark Charcoal */
+    section[data-testid="stSidebar"],
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] div,
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4 {
+        color: #151D2A !important;
+    }
+
+    /* Radio navigation labels - ensure 100% visible and stylish */
+    section[data-testid="stSidebar"] .stRadio label,
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label,
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label p,
+    section[data-testid="stSidebar"] .stRadio label p,
+    section[data-testid="stSidebar"] .stRadio label span,
+    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] p,
+    section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] span {
+        color: #151D2A !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+    }
+
+    /* Navigation Radio Items with Interactive Hover & Active Pill Feedback */
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label {
+        padding: 7px 10px !important;
+        border-radius: 10px !important;
+        margin-bottom: 3px !important;
+        border: 1.5px solid transparent !important;
+        transition: all 0.15s ease !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label:hover {
+        background-color: #EDECE7 !important;
+        border: 1.5px solid #1E1E24 !important;
+        box-shadow: 2px 2px 0px #1E1E24 !important;
+    }
+
+    /* Active Selected Radio Item */
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label[data-checked="true"],
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label:has(input:checked) {
+        background-color: #FFFFFF !important;
+        border: 2px solid #1E1E24 !important;
+        box-shadow: 3px 3px 0px #9B72CF !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label[data-checked="true"] p,
+    section[data-testid="stSidebar"] .stRadio div[role="radiogroup"] > label:has(input:checked) p {
+        color: #151D2A !important;
+        font-weight: 800 !important;
+    }
+
+    /* Radio button inner dot color */
+    section[data-testid="stSidebar"] input[type="radio"]:checked + div {
+        background-color: #9B72CF !important;
+        border-color: #1E1E24 !important;
+    }
+
+    /* Sidebar Expander Header & Text Inputs */
+    section[data-testid="stSidebar"] .streamlit-expanderHeader {
+        background-color: #FFFFFF !important;
+        border: 2px solid #1E1E24 !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        box-shadow: 2px 2px 0px #1E1E24 !important;
+    }
+
+    section[data-testid="stSidebar"] .streamlit-expanderHeader p,
+    section[data-testid="stSidebar"] .streamlit-expanderHeader svg {
+        color: #151D2A !important;
+        fill: #151D2A !important;
+        font-weight: 700 !important;
+    }
+
+    section[data-testid="stSidebar"] input[type="text"] {
+        background-color: #FFFFFF !important;
+        color: #151D2A !important;
+        border: 2px solid #1E1E24 !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+
+    /* Section Subheaders */
+    section[data-testid="stSidebar"] h3 {
+        color: #151D2A !important;
+        font-weight: 900 !important;
+        font-size: 15px !important;
+        letter-spacing: -0.02em !important;
+        border-bottom: 2px solid #1E1E24 !important;
+        padding-bottom: 6px !important;
+        margin-top: 16px !important;
+        margin-bottom: 12px !important;
     }
 
     /* Top Capsule Navigation Bar */
