@@ -4,6 +4,8 @@ import io
 import pandas as pd
 import streamlit as st
 
+from pathlib import Path
+from config.settings import BASE_DIR
 from database.connection import get_db
 from services.excel_service import ExcelService
 from ui.auth import require_role
@@ -32,7 +34,7 @@ def render_excel_view():
             if test_file_path.exists():
                 c_t1, c_t2 = st.columns([2, 1])
                 with c_t1:
-                    st.caption(f"📁 Generated test workbook saved to your Desktop: `C:\\Users\\Hari\\Desktop\\InternFlow_Test_Workbook.xlsx`")
+                    st.caption("📁 Ready-to-use test workbook with exact matching columns (`Review Date`, `Google Meet Link`, `Task Status`, etc.)")
                 with c_t2:
                     st.download_button(
                         label="📥 Download Test File (.xlsx)",
